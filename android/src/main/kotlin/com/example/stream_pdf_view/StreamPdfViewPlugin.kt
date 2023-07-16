@@ -1,6 +1,7 @@
 package com.example.stream_pdf_view
 
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.view.View
@@ -71,7 +72,26 @@ class FlutterPDFView internal constructor(
         val urlPdf = call.arguments as String
         loadAndShowPdf(urlPdf, result)
       }
+      "currentPage" -> getCurrentPage(result)
+      "pageCount" -> getPageCount(result)
+      "jumpTo" -> {
+        val arg = call.arguments as Int
+        jumpTo(arg, result)
+      }
     }
+  }
+
+  private fun getCurrentPage(result: Result) {
+    result.success(pdfView.currentPage)
+  }
+
+  private fun getPageCount(result: Result) {
+    result.success(pdfView.pageCount)
+  }
+
+  private fun jumpTo(to: Int, result: Result) {
+    pdfView.jumpTo(to, true)
+    result.success(null)
   }
 
   @OptIn(DelicateCoroutinesApi::class)
@@ -97,7 +117,13 @@ class FlutterPDFView internal constructor(
   }
 
   private fun openPdf(bytes: ByteArray) {
-    pdfView.fromBytes(bytes).onLoad { Log.println(Log.INFO, null, "Completed") }.load()
+    pdfView.fromBytes(bytes)
+      .onPageChange { page, pageCount ->
+        val args = mapOf<String, Int>("page" to page, "pageCount" to pageCount)
+        methodChannel.invokeMethod("onPageChanged", args)
+      }
+      .onLoad { Log.println(Log.INFO, null, "Completed") }
+      .load()
   }
 }
 

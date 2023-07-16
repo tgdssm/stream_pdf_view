@@ -27,4 +27,16 @@ abstract class StreamPdfViewPlatform extends PlatformInterface {
   Future<void> openPdf(String url) {
     throw UnimplementedError('openPdf() has not been implemented.');
   }
+
+  Future<int?> currentPage() {
+    throw UnimplementedError('currentPage() has not been implemented.');
+  }
+
+  Future<int?> pageCount() {
+    throw UnimplementedError('pageCount() has not been implemented.');
+  }
+
+  Future<void> jumpTo(int to) {
+    throw UnimplementedError('jumpTo() has not been implemented.');
+  }
 }

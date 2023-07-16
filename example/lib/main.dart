@@ -13,7 +13,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,8 +20,11 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: const StreamPDFViewWidget(
-          url: 'https://biblioteca.incaper.es.gov.br/digital/bitstream/item/105/1/MINICURSO-CD-6-RECOMENDACOES-TECNICAS-PARA-MANGA.pdf',
+        body: StreamPDFViewWidget(
+          url:
+              'https://biblioteca.incaper.es.gov.br/digital/bitstream/item/105/1/MINICURSO-CD-6-RECOMENDACOES-TECNICAS-PARA-MANGA.pdf',
+          onChangedPage: (page, pageCount) =>
+              print("TESTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE${[page, pageCount]}"),
         ),
       ),
     );
