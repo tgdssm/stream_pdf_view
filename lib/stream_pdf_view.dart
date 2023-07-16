@@ -61,7 +61,6 @@ class _StreamPDFViewWidgetState extends State<StreamPDFViewWidget> {
                     const Duration(milliseconds: 100),
                     () async {
                       await _streamPdfViewPlugin.jumpTo(widget.jumpTo!);
-                      setState(() {});
                     },
                   );
                 }
@@ -72,13 +71,17 @@ class _StreamPDFViewWidgetState extends State<StreamPDFViewWidget> {
         ),
         SizedBox(
           height: 50,
-          child: Slider(
-            value: controller.getValue(),
-            onChanged: (value) async {
-              controller.currentPage = (controller.pageCount * value).toInt();
-              await _streamPdfViewPlugin.jumpTo(controller.currentPage);
-              setState(() {});
-            },
+          child: ListenableBuilder(
+            listenable: controller,
+            builder: (context, widget) {
+              return Slider(
+                value: controller.sliderValue,
+                onChanged: (value) async {
+                  controller.currentPage = (controller.pageCount * value).toInt();
+                  await _streamPdfViewPlugin.jumpTo(controller.currentPage);
+                },
+              );
+            }
           ),
         )
       ],
@@ -86,11 +89,12 @@ class _StreamPDFViewWidgetState extends State<StreamPDFViewWidget> {
   }
 }
 
-class ViewController {
+class ViewController extends ChangeNotifier{
   late final MethodChannel channel;
   StreamPDFViewWidget? widget;
   int currentPage = 0;
   int pageCount = 0;
+  double sliderValue = 0;
   ViewController() {
     channel = const MethodChannel('stream_pdf_view');
     channel.setMethodCallHandler(onMethodCall);
@@ -105,6 +109,8 @@ class ViewController {
           currentPage,
           pageCount,
         );
+        getValue();
+        notifyListeners();
         break;
       default:
         // print(call.arguments);
@@ -112,10 +118,15 @@ class ViewController {
     }
   }
 
-  double getValue() {
+  void getValue() {
     if (currentPage == 0 || pageCount == 0) {
-      return 0;
+      sliderValue = 0;
     }
-    return currentPage / pageCount;
+    sliderValue = currentPage / pageCount;
+  }
+
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
   }
 }
